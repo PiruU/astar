@@ -24,7 +24,7 @@ It provides simple primitives (`Vertex`, `Face`, `Edge`), utilities (`EdgeMap`, 
 ## Overview
 
 This library lets you compute shortest paths on meshes using the **A*** algorithm.  
-Given a set of vertices and triangular faces, it builds edge and connectivity maps, applies heuristics, and finds the optimal path between two vertices.
+Given a set of vertices and triangular faces, it finds the optimal path between two vertices.
 
 ---
 
