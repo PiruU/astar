@@ -67,8 +67,8 @@ tests/
 Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/pathfinding.git
-cd pathfinding
+git clone https://github.com/PiruU/astar
+cd astar
 ```
 
 Make sure you have:  
