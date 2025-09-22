@@ -1,4 +1,4 @@
-# Pathfinding Library
+# Astar Library
 
 A lightweight C++17 library implementing an **A*** pathfinding algorithm on 3D meshes.  
 It provides simple primitives (`Vertex`, `Face`, `Edge`), utilities (`EdgeMap`, `ConnectivityMap`), and the `find_best_path` function.
