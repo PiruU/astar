@@ -62,6 +62,7 @@ TEST(PondDualAStarTest, FindShortPathOnPondMesh) {
     EXPECT_EQ(p.at(1), 18u);
     EXPECT_EQ(p.at(2), 25u);
     EXPECT_EQ(p.at(3), 26u);
+
 }
 
 
