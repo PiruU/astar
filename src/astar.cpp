@@ -1,3 +1,4 @@
+#include <numeric>
 #include <variant>
 
 #include "vertex.h"
@@ -41,6 +42,26 @@ bool extend_path(Path& path, const Vertices& vertices, const ConnectivityMap& co
 
 }
 
+Vertex face_center(const Mesh& mesh, const std::size_t i_face) {
+    const auto& face = mesh.faces[i_face];
+    return std::accumulate(face.begin(), face.end(), std::array<float, 3>{ 0, 0, 0 }, [&mesh](std::array<float,3> acc, std::size_t idx) {
+            const Vertex& p = mesh.vertices[idx];
+            acc[0] += p[0];
+            acc[1] += p[1];
+            acc[2] += p[2];
+            return acc;
+    });
+}
+
+Vertices build_centroids(const Mesh &mesh) {
+    auto centroids = Vertices{ };
+    centroids.reserve(mesh.faces.size());
+    for(std::size_t face=0; face < mesh.faces.size(); ++face) {
+        centroids.push_back(face_center(mesh, face));
+    }
+    return centroids;
+}
+
 class FindBestPath {
 
 private:
@@ -63,7 +84,11 @@ public:
 
     Path operator()(const std::pair<Barycenter, Barycenter>& ends) const {
 
-        return { };
+        auto path = Path{ ends.first.face };
+        const auto centroids = build_centroids(mesh);
+        const auto connectivity = ConnectivityMapFactory::make_face_to_face(mesh.faces);
+        detail::extend_path(path, centroids, connectivity, heuristics, ends.second.face);
+        return path;
     
     }
 
