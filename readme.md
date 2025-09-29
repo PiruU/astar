@@ -17,8 +17,7 @@ Lightweight C++17 library implementing a **pathfinding (A\*)** algorithm on 3D t
    - [Python Smoke Test](#python-smoke-test)  
 7. [Usage Examples](#usage-examples)  
    - [C++](#c)  
-   - [Python](#python)  
-8. [Troubleshooting (Build FAQ)](#troubleshooting-build-faq)
+   - [Python](#python)
 
 ---
 
@@ -223,31 +222,3 @@ ends = ap.ends_vertex_vertex(0, 2)
 p = ap.find_best_path(m, h, ends, retrieve_vertices=True)
 print(p.steps, p.vertices)
 ```
-
----
-
-## Troubleshooting (Build FAQ)
-
-- **CMake cache conflict**  
-  `CMakeLists.txt does not match the source …`  
-  → Use **one build dir per source** (`build/`, `build_py/`). Remove `CMakeCache.txt` if needed.
-
-- **Python / nanobind order**  
-  `You must invoke find_package(Python …) prior to including nanobind`  
-  → Call `find_package(Python … Interpreter Development.Module)` **before** `find_package(nanobind)`.
-
-- **Missing nanobind headers** (`nanobind/trampoline.h`, etc.)  
-  → Prefer nanobind installed via **pip** and pass  
-  `-Dnanobind_DIR="$(python -m nanobind --cmake_dir)"`.
-
-- **nanobind CLI option**  
-  → The correct option is `--cmake_dir` (underscore), not `--cmake-dir`.
-
-- **ImportError: missing PyInit_…**  
-  → Ensure the module name is aligned:  
-  `NB_MODULE(astar_py, m)` / `nanobind_add_module(astar_py …)` / `import astar_py`, then **clean rebuild**.
-
-- **Linker issues**  
-  `ld: library 'xxx' not found`  
-  → Link the actual **CMake target** (e.g., `astar_lib`):  
-  `target_link_libraries(astar_py PRIVATE astar_lib)`.
