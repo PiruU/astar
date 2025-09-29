@@ -28,6 +28,8 @@ struct EdgeHash {
 
 using EdgeMap = std::unordered_map<Edge, float, EdgeHash, EdgeEqual>;
 
+std::array<Edge, 3> face_edges(const Face& face);
+
 namespace EdgeMapFactory {
 
 EdgeMap make(const Vertices& vertices, const Faces& faces);

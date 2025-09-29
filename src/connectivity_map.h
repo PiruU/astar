@@ -12,7 +12,9 @@ using ConnectivityMap = std::unordered_map<std::size_t, std::unordered_set<std::
 
 namespace ConnectivityMapFactory {
 
-ConnectivityMap make_node_to_node(const Vertices& vertices, const Faces& faces);
+ConnectivityMap make_vertex_to_vertex(const Vertices& vertices, const Faces& faces);
+
+ConnectivityMap make_face_to_face(const Faces& faces);
 
 } // // namespace astar::ConnectivityMapFactory
 
