@@ -1,11 +1,8 @@
-#include <atomic>
 #include <gtest/gtest.h>
 
 #include "astar.h"
-#include "vertex.h"
-#include "face.h"
-#include "mesh.h"
 #include "heuristics.h"
+#include "helpers.h"
 
 namespace astar {
 
@@ -13,60 +10,13 @@ namespace tests {
 
 namespace {
 
-Mesh make_simple_square() {
-
-    const auto vertices = Vertices{
-        { 0.0f, 0.0f, 0.0f },
-        { 1.0f, 0.0f, 0.0f },
-        { 1.0f, 1.0f, 0.0f },
-        { 0.0f, 1.0f, 0.0f } 
-    };
-
-    const auto faces = Faces{
-        { { 0, 1, 2 } },
-        { { 0, 2, 3 } }
-    };
-
-    return { vertices, faces };
-
-}
-
-Mesh make_complex_grid() {
-
-    const auto vertices = Vertices{
-        { 0.0f, 0.0f, 0.0f },
-        { 1.5f, 0.0f, 0.0f }, // small x-offset here
-        { 2.0f, 0.0f, 0.0f },
-        { 0.0f, 1.0f, 0.0f },
-        { 1.0f, 1.0f, 0.0f },
-        { 2.0f, 1.0f, 0.0f },
-        { 0.0f, 2.0f, 0.0f },
-        { 1.0f, 2.0f, 0.0f },
-        { 2.0f, 2.0f, 0.0f },
-    };
-
-    const auto faces = Faces{
-        { { 0, 1, 4 } },
-        { { 0, 4, 3 } },
-        { { 1, 5, 4 } },
-        { { 1, 2, 5 } },
-        { { 3, 4, 6 } },
-        { { 4, 7, 6 } },
-        { { 4, 8, 7 } },
-        { { 4, 5, 8 } },
-    };
-
-    return { vertices, faces };
-
-}
-
 } // namespace astar::tests::Anonymous
 
 TEST(SimpleAStarTest, FindsDirectShortestPathOnSimpleSquareMesh) {
 
-    const auto mesh = make_simple_square();
+    const auto mesh = MeshFactory::make_simple();
     const auto h = HeuristicsFactory::make_euclidian(mesh.vertices[3]);
-    const auto p = find_best_path(mesh, h, std::pair<std::size_t, std::atomic_size_t>{ 0, 3 });
+    const auto p = find_best_path(mesh, h, std::pair<std::size_t, std::size_t>{ 0, 3 });
 
     ASSERT_EQ(p.size() , 2u);
     EXPECT_EQ(p.front(), 0u);
@@ -76,9 +26,9 @@ TEST(SimpleAStarTest, FindsDirectShortestPathOnSimpleSquareMesh) {
 
 TEST(ComplexAStarTest, FindsStraightShortestPathOnComplexGridMesh) {
 
-    const auto mesh = make_complex_grid();
+    const auto mesh = MeshFactory::make_complex();
     const auto h = HeuristicsFactory::make_euclidian(mesh.vertices[8]);
-    const auto p = find_best_path(mesh, h, std::pair<std::size_t, std::atomic_size_t>{ 0, 8 });
+    const auto p = find_best_path(mesh, h, std::pair<std::size_t, std::size_t>{ 0, 8 });
 
     ASSERT_EQ(p.size() , 3u);
     EXPECT_EQ(p.at(0), 0u);
@@ -89,9 +39,9 @@ TEST(ComplexAStarTest, FindsStraightShortestPathOnComplexGridMesh) {
 
 TEST(ComplexAStarTest, FindsTwistedShortestPathOnComplexGridMesh) {
 
-    const auto mesh = make_complex_grid();
+    const auto mesh = MeshFactory::make_complex();
     const auto h = HeuristicsFactory::make_euclidian(mesh.vertices[2]);
-    const auto p = find_best_path(mesh, h, std::pair<std::size_t, std::atomic_size_t>{ 6, 2 });
+    const auto p = find_best_path(mesh, h, std::pair<std::size_t, std::size_t>{ 6, 2 });
 
     ASSERT_EQ(p.size() , 4u);
     EXPECT_EQ(p.at(0), 6u);
@@ -100,6 +50,17 @@ TEST(ComplexAStarTest, FindsTwistedShortestPathOnComplexGridMesh) {
     EXPECT_EQ(p.at(3), 2u);
 
 }
+
+TEST(PondDualAStarTest, FindShortPathOnPondMesh) {
+
+    const auto mesh = MeshFactory::make_pond();
+    const auto h = HeuristicsFactory::make_euclidian(mesh.vertices[2]);
+    const auto p = find_best_path(mesh, h, std::pair<Barycenter, Barycenter>{ {17, { 1.f, 1.f, 1.f } }, { 26, { 1.f, 1.f, 1.f } } });
+
+    ASSERT_EQ(1, 2);
+}
+
+
 
 } // namespace astar::tests
 
