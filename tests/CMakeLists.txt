@@ -1,4 +1,5 @@
 add_executable(astar_tests
+  helpers.cpp
   astar_test.cpp
   connectivity_map_test.cpp
   edge_map_test.cpp
