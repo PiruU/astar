@@ -12,10 +12,8 @@ Lightweight C++17 library implementing a **pathfinding (A\*)** algorithm on 3D t
 4. [Prerequisites](#prerequisites)  
 5. [Build (C++ library)](#build-c-library)  
 6. [Unit Tests (GoogleTest)](#unit-tests-googletest)  
-6. [Python Binding (nanobind)](#python-binding-nanobind)  
-   - [Build the Python Module](#build-the-python-module)  
-   - [Python Smoke Test](#python-smoke-test)  
-7. [Usage Examples](#usage-examples)  
+7. [Python Binding (nanobind)](#python-binding-nanobind)   
+8. [Usage Examples](#usage-examples)  
    - [C++](#c)  
    - [Python](#python)
 
@@ -138,8 +136,6 @@ cmake --build build_tests -j
 
 ## Python Binding (nanobind)
 
-### Build the Python Module
-
 ```bash
 python -m pip install -U nanobind
 
@@ -150,23 +146,6 @@ cmake --build build_py -j
 ```
 
 The produced module will typically be `astar_py.cpython-<ver>-<plat>.so` under `build_py/`.
-
-### Python Smoke Test
-
-```bash
-PYTHONPATH=build_py python - <<'PY'
-import math, astar_py as ap
-m = ap.Mesh()
-m.vertices = [(0.0,0.0,0.0),(1.0,0.0,0.0),(0.0,1.0,0.0)]
-m.faces    = [(0,1,2)]
-h = ap.Heuristics()
-h.distance = lambda a,b: math.dist(a,b)
-ends = ap.ends_vertex_vertex(0, 2)
-p = ap.find_best_path(m, h, ends, retrieve_vertices=True)
-print("steps:", p.steps)
-print("vertices:", p.vertices)
-PY
-```
 
 ---
 
