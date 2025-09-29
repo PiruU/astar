@@ -13,17 +13,30 @@ namespace detail {
 struct NeighborLess {
 
     const std::vector<Vertex>& vertices;
-    const EdgeMap& edges;
     const Heuristics &heuristics;
     const std::size_t current;
 
     bool operator()(const std::size_t one, const std::size_t other) const {
-        const auto one_cost = edges.at({ one, current }) + heuristics(vertices[one]);
-        const auto other_cost = edges.at({ other, current }) + heuristics(vertices[other]);
+        const auto one_cost   = heuristics.distance(vertices[current], vertices[one]  ) + heuristics.distance(vertices[one]  , heuristics.target);
+        const auto other_cost = heuristics.distance(vertices[current], vertices[other]) + heuristics.distance(vertices[other], heuristics.target);
         return one_cost < other_cost;
     }
 
 };
+
+Path find_path(const Path& path, const Vertices& vertices, const ConnectivityMap& connectivity, const Heuristics& heuristics, const std::size_t last) {
+
+    const auto back = path.back();
+    if(back == last) {
+        return path;
+    } else {
+        const auto step = *std::min_element(connectivity.at(back).begin(), connectivity.at(back).end(), detail::NeighborLess{ vertices, heuristics, back });
+        auto new_path = Path{ path };
+        new_path.emplace_back(step);
+        return find_path(new_path, vertices, connectivity, heuristics, last);     
+    }
+
+}
 
 } // namespace squaremind::detail
 
@@ -31,14 +44,7 @@ Path find_best_path(const Vertices& vertices, const Faces& faces, const Heuristi
 
     const auto edges = EdgeMapFactory::make(vertices, faces);
     const auto connectivity = ConnectivityMapFactory::make(edges);
-    auto path = Path{ startAndTarget.first };
-    while(path.back() != startAndTarget.second) {
-        const auto neighbors = connectivity.at(path.back());
-        path.push_back(
-            *std::min_element(neighbors.begin(), neighbors.end(), detail::NeighborLess{ vertices, edges, heuristics, path.back()})
-        );
-    }
-    return path;
+    return detail::find_path({ startAndTarget.first }, vertices, connectivity, heuristics, startAndTarget.second);
 
 }
 

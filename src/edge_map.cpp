@@ -9,9 +9,11 @@ namespace astar {
 namespace detail {
 
 std::array<Edge, 3> face_edges(const Face& face) {
+
     return {
         Edge{ { face[0], face[1] } }, Edge{ { face[1], face[2] } }, Edge{ { face[2], face[0] } }
     };
+    
 }
 
 struct AccumulateEdge {
@@ -26,6 +28,7 @@ struct AccumulateEdge {
 };
 
 struct InsertFaceEdges {
+
     EdgeMap& edge_map;
     const std::vector<Vertex>& vertices;
 
