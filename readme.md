@@ -213,3 +213,11 @@ Run all tests after building:
 ./build/tests/heuristics_test
 ./build/tests/norms_test
 ```
+
+## Python binding
+
+rm -rf build_py
+cmake -S python_package -B build_py \
+  -DPython_EXECUTABLE="$(python -c 'import sys; print(sys.executable)')" \
+  -Dnanobind_DIR="$(python -m nanobind --cmake_dir)"
+cmake --build build_py -j
