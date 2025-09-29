@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
+
 #include "connectivity_map.h"
-#include "edge_map.h"
 #include "vertex.h"
 #include "face.h"
 
