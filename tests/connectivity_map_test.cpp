@@ -19,8 +19,7 @@ TEST(ConnectivityMapTest, TriangleAdjacencyIsBidirectional) {
         { {0, 1, 2} }
     };
 
-    const auto edges = EdgeMapFactory::make(vertices, faces);
-    const auto connectivity = ConnectivityMapFactory::make(edges);
+    const auto connectivity = ConnectivityMapFactory::make_node_to_node(vertices, faces);
 
     ASSERT_EQ(connectivity.size(), 3u);
 

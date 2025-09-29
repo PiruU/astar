@@ -1,7 +1,5 @@
 #include "vertex.h"
-#include "face.h"
 #include "heuristics.h"
-#include "edge_map.h"
 #include "connectivity_map.h"
 
 #include "astar.h"
@@ -24,27 +22,30 @@ struct NeighborLess {
 
 };
 
-Path find_path(const Path& path, const Vertices& vertices, const ConnectivityMap& connectivity, const Heuristics& heuristics, const std::size_t last) {
+bool extend_path(Path& path, const Vertices& vertices, const ConnectivityMap& connectivity, const Heuristics& heuristics, const std::size_t last) {
 
     const auto back = path.back();
     if(back == last) {
-        return path;
+        return true;
     } else {
-        const auto step = *std::min_element(connectivity.at(back).begin(), connectivity.at(back).end(), detail::NeighborLess{ vertices, heuristics, back });
-        auto new_path = Path{ path };
-        new_path.emplace_back(step);
-        return find_path(new_path, vertices, connectivity, heuristics, last);     
+        path.emplace_back(*std::min_element(
+            connectivity.at(back).begin(),
+            connectivity.at(back).end(),
+            detail::NeighborLess{ vertices, heuristics, back })
+        );
+        extend_path(path, vertices, connectivity, heuristics, last);     
+        return false;
     }
 
 }
 
 } // namespace squaremind::detail
 
-Path find_best_path(const Vertices& vertices, const Faces& faces, const Heuristics& heuristics, const EndVertices& startAndTarget) {
+Path find_best_path(const Vertices& vertices, const ConnectivityMap& connectivity, const Heuristics& heuristics, const EndVertices& startAndTarget) {
 
-    const auto edges = EdgeMapFactory::make(vertices, faces);
-    const auto connectivity = ConnectivityMapFactory::make(edges);
-    return detail::find_path({ startAndTarget.first }, vertices, connectivity, heuristics, startAndTarget.second);
+    auto path = Path{ startAndTarget.first };
+    detail::extend_path(path, vertices, connectivity, heuristics, startAndTarget.second);
+    return path;
 
 }
 
