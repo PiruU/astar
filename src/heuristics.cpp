@@ -1,5 +1,4 @@
 #include "norms.h"
-#include "vertex.h"
 
 #include "heuristics.h"
 
@@ -7,9 +6,9 @@ namespace astar {
 
 namespace HeuristicsFactory {
 
-Heuristics make_euclidian(const Vertex& target) {
+Heuristics make_euclidian() {
 
-    return Heuristics{ target, { euclidian_norm } };
+    return Heuristics{ { euclidian_norm } };
 
 }
 
