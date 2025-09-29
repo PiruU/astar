@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "edge_map.h"
+#include "vertex.h"
 #include "face.h"
 
 namespace astar {
