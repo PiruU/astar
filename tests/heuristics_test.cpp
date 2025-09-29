@@ -14,7 +14,7 @@ TEST(HeuristicsTest, EuclidianHeuristicEqualsDistanceToTarget) {
 
     const auto p = Vertex{ 4.0f, -2.0f, 7.5f };
     float expected = euclidian_norm(p, target);
-    EXPECT_NEAR(h(p), expected, 1e-5f);
+    EXPECT_NEAR(h.distance(p, target), expected, 1e-5f);
 }
 
 } // namespace astar::tests

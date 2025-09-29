@@ -11,8 +11,6 @@ struct Heuristics {
     Vertex target;
     std::function<float(const Vertex&, const Vertex&)> distance;
 
-    float operator()(const Vertex& vertex) const;
-
 };
 
 namespace HeuristicsFactory {
