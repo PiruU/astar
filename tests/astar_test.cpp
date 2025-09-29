@@ -65,7 +65,15 @@ TEST(PondDualAStarTest, FindShortPathOnPondMesh) {
 
 }
 
+TEST(PondDualAStarTest, FindLongUndeterminedPathOnPondMesh) {
 
+    const auto mesh = MeshFactory::make_pond();
+    const auto h = HeuristicsFactory::make_euclidian();
+    const auto p = find_best_path(mesh, h, std::pair<Barycenter, Barycenter>{ {0, { 1.f, 1.f, 1.f } }, { 26, { 1.f, 1.f, 1.f } } });
+
+    ASSERT_EQ(p.size() , 14u);
+
+}
 
 } // namespace astar::tests
 
