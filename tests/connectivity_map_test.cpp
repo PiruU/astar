@@ -9,6 +9,7 @@ namespace astar {
 namespace tests {
 
 TEST(ConnectivityMapTest, TriangleAdjacencyIsBidirectional) {
+
     const auto vertices = Vertices{
         { 0.0f, 0.0f, 0.0f },
         { 1.0f, 0.0f, 0.0f },
@@ -38,6 +39,7 @@ TEST(ConnectivityMapTest, TriangleAdjacencyIsBidirectional) {
     EXPECT_TRUE(connectivity.at(2).count(0));
     EXPECT_TRUE(connectivity.at(2).count(1));
     EXPECT_FALSE(connectivity.at(2).count(2));
+    
 }
 
 } // namespace astar::tests

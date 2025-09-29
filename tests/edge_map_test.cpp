@@ -35,6 +35,7 @@ TEST(EdgeMapTest, TriangleProducesThreeEdgesWithCorrectLengths) {
     
     EXPECT_NEAR(edges.at({ { 2, 0 } }), d20, 1e-5f);
     EXPECT_NEAR(edges.at({ { 0, 2 } }), d20, 1e-5f);
+    
 }
 
 } // namespace astar::tests
