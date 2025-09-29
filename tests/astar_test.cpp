@@ -1,7 +1,8 @@
 #include <gtest/gtest.h>
 
-#include "astar.h"
-#include "heuristics.h"
+#include "astar/astar.h"
+#include "astar/heuristics.h"
+
 #include "helpers.h"
 
 namespace astar {

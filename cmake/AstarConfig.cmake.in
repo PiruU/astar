@@ -1,0 +1,11 @@
+@PACKAGE_INIT@
+
+# Fournit les imports des cibles installées
+include("${CMAKE_CURRENT_LIST_DIR}/AstarTargets.cmake")
+
+# Optionnel : vérifier des dépendances ici (find_dependency(...) si besoin)
+# include(CMakeFindDependencyMacro)
+# find_dependency(<Dep> REQUIRED)
+
+# Variables d'aide pour le consommateur
+set(Astar_INCLUDE_DIRS "@PACKAGE_INCLUDE_INSTALL_DIR@")

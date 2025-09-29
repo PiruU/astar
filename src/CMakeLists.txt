@@ -1,4 +1,8 @@
-add_library(astar_lib
+if(TARGET astar)
+  message(FATAL_ERROR "La cible 'astar' existe déjà. 'src' est ajouté deux fois.")
+endif()
+
+add_library(astar
   astar.cpp
   connectivity_map.cpp
   edge_map.cpp
@@ -6,9 +10,9 @@ add_library(astar_lib
   norms.cpp
 )
 
-target_include_directories(astar_lib
-  PUBLIC
-    ${CMAKE_CURRENT_LIST_DIR}
+target_include_directories(astar PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-target_compile_features(astar_lib PUBLIC cxx_std_17)
+target_compile_features(astar PUBLIC cxx_std_17)

@@ -1,6 +1,6 @@
-#include "norms.h"
+#include "astar/norms.h"
 
-#include "heuristics.h"
+#include "astar/heuristics.h"
 
 namespace astar {
 

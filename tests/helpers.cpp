@@ -1,6 +1,6 @@
-#include "face.h"
-#include "vertex.h"
-#include "mesh.h"
+#include "astar/face.h"
+#include "astar/vertex.h"
+#include "astar/mesh.h"
 
 #include "helpers.h"
 

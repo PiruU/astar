@@ -10,9 +10,7 @@ Lightweight C++17 library implementing a **pathfinding (A\*)** algorithm on 3D t
 2. [Main Structures & API](#main-structures--api)  
 3. [Repository Layout](#repository-layout)  
 4. [Prerequisites](#prerequisites)  
-5. [Build (C++ library)](#build-c-library)  
-6. [Unit Tests (GoogleTest)](#unit-tests-googletest)  
-7. [Python Binding (nanobind)](#python-binding-nanobind)   
+5. [Build (C++ library, GoogleTest, Python binding)](#build-c-library-googletest-python-binding)   
 8. [Usage Examples](#usage-examples)  
    - [C++](#c)  
    - [Python](#python)
@@ -84,18 +82,44 @@ Path find_best_path(const Mesh& mesh,
 ## Repository Layout
 
 ```
-src/
-├── astar.cpp / astar.h                  # A* / find_best_path (+ Barycenter, Ends)
-├── connectivity_map.cpp / .h            # connectivity construction
-├── edge_map.cpp / .h                    # edge construction
-├── heuristics.cpp / .h                  # heuristics (distance)
-├── norms.cpp / .h                       # norms (Euclidean…)
-├── face.h  mesh.h  path.h  vertex.h     # basic types
-└── CMakeLists.txt                       # builds the C++ lib (e.g. target astar_lib)
-
-python_package/
-├── bindings.cpp                         # nanobind module
-└── CMakeLists.txt                       # builds the Python module (target astar_py)
+├── CMakeLists.txt 
+├── benches 
+│ ├── bench_python.py 
+│ ├── mesh_display.py 
+│ └── path_display.py 
+├── cmake 
+│ └── AstarConfig.cmake.in 
+├── include 
+│ └── astar 
+│ ├── astar.h 
+│ ├── connectivity_map.h 
+│ ├── edge_map.h 
+│ ├── face.h 
+│ ├── heuristics.h 
+│ ├── mesh.h 
+│ ├── norms.h 
+│ ├── path.h 
+│ └── vertex.h 
+├── python_package 
+│ ├── CMakeLists.txt 
+│ └── bindings.cpp 
+├── readme.md 
+├── src 
+│ ├── CMakeLists.txt 
+│ ├── astar.cpp 
+│ ├── connectivity_map.cpp 
+│ ├── edge_map.cpp 
+│ ├── heuristics.cpp 
+│ └── norms.cpp 
+└── tests 
+├── CMakeLists.txt 
+├── astar_test.cpp 
+├── connectivity_map_test.cpp 
+├── edge_map_test.cpp 
+├── helpers.cpp 
+├── helpers.h 
+├── heuristics_test.cpp 
+└── norms_test.cpp.
 ```
 
 > The Python bindings are isolated under `python_package/` and link against the C++ library built from `src/`.
@@ -110,42 +134,24 @@ python_package/
 
 ---
 
-## Build (C++ library)
+## Build (C++ library, GoogleTest, Python binding)
 
 From the repository root:
 
 ```bash
-cmake -S src -B build_core -DCMAKE_BUILD_TYPE=Release
-cmake --build build_core -j
+rm -rf build CMakeCache.txt CMakeFiles astar-install
+cmake -S . -B build -DPython_EXECUTABLE="$(python -c 'import sys; print(sys.executable)')" -Dnanobind_DIR="$(python -m nanobind --cmake_dir)"
+cmake --build build
 ```
 
-The static/shared library will be generated (for example: target `astar_lib` → `build_core/libastar_lib.a`).
+The static/shared library will be generated (for example: target `astar_lib` → `build/src/libastar_lib.a`).
 
----
-
-## Unit Tests (GoogleTest)
-
+## Install library
 From the repository root:
 
 ```bash
-cmake -S tests -B build_tests -DCMAKE_BUILD_TYPE=Release
-cmake --build build_tests -j
+cmake --install build --prefix "${PWD}/astar-install"
 ```
-
----
-
-## Python Binding (nanobind)
-
-```bash
-python -m pip install -U nanobind
-
-rm -rf build_py
-cmake -S python_package -B build_py   -DPython_EXECUTABLE="$(python -c 'import sys; print(sys.executable)')"   -Dnanobind_DIR="$(python -m nanobind --cmake_dir)"
-
-cmake --build build_py -j
-```
-
-The produced module will typically be `astar_py.cpython-<ver>-<plat>.so` under `build_py/`.
 
 ---
 

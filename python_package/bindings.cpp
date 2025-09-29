@@ -6,12 +6,12 @@
 #include <nanobind/stl/pair.h>
 #include <nanobind/stl/function.h>
 
-#include "../src/vertex.h"
-#include "../src/face.h"
-#include "../src/path.h"
-#include "../src/mesh.h"
-#include "../src/heuristics.h"
-#include "../src/astar.h"
+#include "astar/vertex.h"
+#include "astar/face.h"
+#include "astar/path.h"
+#include "astar/mesh.h"
+#include "astar/heuristics.h"
+#include "astar/astar.h"
 
 namespace nb = nanobind;
 using namespace nb::literals;

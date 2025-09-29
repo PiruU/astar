@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
-#include "connectivity_map.h"
-#include "vertex.h"
-#include "face.h"
+#include "astar/connectivity_map.h"
+#include "astar/vertex.h"
+#include "astar/face.h"
 
 namespace astar {
 

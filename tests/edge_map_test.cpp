@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 
-#include "edge_map.h"
-#include "vertex.h"
-#include "face.h"
-#include "norms.h"
+#include "astar/edge_map.h"
+#include "astar/vertex.h"
+#include "astar/face.h"
+#include "astar/norms.h"
 
 namespace astar {
 

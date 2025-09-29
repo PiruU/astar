@@ -1,8 +1,8 @@
-#include "norms.h"
-#include "vertex.h"
-#include "face.h"
+#include "astar/norms.h"
+#include "astar/vertex.h"
+#include "astar/face.h"
 
-#include "edge_map.h"
+#include "astar/edge_map.h"
 
 namespace astar {
 

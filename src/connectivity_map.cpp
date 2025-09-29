@@ -1,8 +1,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "connectivity_map.h"
-#include "edge_map.h"
+#include "astar/connectivity_map.h"
+#include "astar/edge_map.h"
 
 namespace astar {
 

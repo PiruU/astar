@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mesh.h"
+#include "astar/mesh.h"
 
 namespace astar {
 

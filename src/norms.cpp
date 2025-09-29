@@ -1,7 +1,7 @@
 #include <cmath>
 
-#include "vertex.h"
-#include "norms.h"
+#include "astar/vertex.h"
+#include "astar/norms.h"
 
 namespace astar {
 

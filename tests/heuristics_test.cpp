@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
-#include "heuristics.h"
-#include "norms.h"
-#include "vertex.h"
+#include "astar/heuristics.h"
+#include "astar/norms.h"
+#include "astar/vertex.h"
 
 namespace astar {
 

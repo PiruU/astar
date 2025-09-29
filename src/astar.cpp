@@ -3,11 +3,11 @@
 #include <optional>
 #include <variant>
 
-#include "vertex.h"
-#include "heuristics.h"
-#include "connectivity_map.h"
+#include "astar/vertex.h"
+#include "astar/heuristics.h"
+#include "astar/connectivity_map.h"
 
-#include "astar.h"
+#include "astar/astar.h"
 
 namespace astar {
 

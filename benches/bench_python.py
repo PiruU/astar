@@ -1,6 +1,6 @@
 import math, sys, pathlib, matplotlib.pyplot
 
-build = pathlib.Path(__file__).resolve().parents[1] / "build_py"
+build = pathlib.Path(__file__).resolve().parents[1] / "build/python_package"
 if build.exists():
     sys.path.insert(0, str(build))
 

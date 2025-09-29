@@ -1,9 +1,6 @@
 find_package(Python 3.8 COMPONENTS Interpreter Development.Module REQUIRED)
 find_package(nanobind CONFIG REQUIRED)
 
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../src
-                 ${CMAKE_CURRENT_BINARY_DIR}/_astar_core_build)
-
 nanobind_add_module(astar_py MODULE bindings.cpp)
 
 if (TARGET astar_lib)
