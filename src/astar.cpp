@@ -1,4 +1,3 @@
-#include <numeric>
 #include <variant>
 
 #include "vertex.h"
@@ -44,13 +43,10 @@ bool extend_path(Path& path, const Vertices& vertices, const ConnectivityMap& co
 
 Vertex face_center(const Mesh& mesh, const std::size_t i_face) {
     const auto& face = mesh.faces[i_face];
-    return std::accumulate(face.begin(), face.end(), std::array<float, 3>{ 0, 0, 0 }, [&mesh](std::array<float,3> acc, std::size_t idx) {
-            const Vertex& p = mesh.vertices[idx];
-            acc[0] += p[0];
-            acc[1] += p[1];
-            acc[2] += p[2];
-            return acc;
-    });
+    const auto& a = mesh.vertices[face[0]];
+    const auto& b = mesh.vertices[face[1]];
+    const auto& c = mesh.vertices[face[2]];
+    return { (a[0] + b[0] + c[0]) / 3.f, (a[1] + b[1] + c[1]) / 3.f, (a[2] + b[2] + c[2]) / 3.f };
 }
 
 Vertices build_centroids(const Mesh &mesh) {
