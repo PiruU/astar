@@ -75,7 +75,7 @@ TEST(SimpleAStarTest, FindsDirectShortestPathOnSimpleSquareMesh) {
     const auto h = HeuristicsFactory::make_euclidian(mesh.vertices[3]);
 
     const auto startTarget = EndVertices{0, 3};
-    const auto connectivity = ConnectivityMapFactory::make_node_to_node(mesh.vertices, mesh.faces);
+    const auto connectivity = ConnectivityMapFactory::make_vertex_to_vertex(mesh.vertices, mesh.faces);
     const auto p = find_best_path(mesh.vertices, connectivity, h, startTarget);
 
     ASSERT_EQ(p.size() , 2u);
@@ -91,7 +91,7 @@ TEST(ComplexAStarTest, FindsStraightShortestPathOnComplexGridMesh) {
     const auto h = HeuristicsFactory::make_euclidian(mesh.vertices[8]);
 
     const auto startTarget = EndVertices{0, 8};
-    const auto connectivity = ConnectivityMapFactory::make_node_to_node(mesh.vertices, mesh.faces);
+    const auto connectivity = ConnectivityMapFactory::make_vertex_to_vertex(mesh.vertices, mesh.faces);
     const auto p = find_best_path(mesh.vertices, connectivity, h, startTarget);
 
     ASSERT_EQ(p.size() , 3u);
@@ -108,7 +108,7 @@ TEST(ComplexAStarTest, FindsTwistedShortestPathOnComplexGridMesh) {
     const auto h = HeuristicsFactory::make_euclidian(mesh.vertices[2]);
 
     const auto startTarget = EndVertices{6, 2};
-    const auto connectivity = ConnectivityMapFactory::make_node_to_node(mesh.vertices, mesh.faces);
+    const auto connectivity = ConnectivityMapFactory::make_vertex_to_vertex(mesh.vertices, mesh.faces);
     const auto p = find_best_path(mesh.vertices, connectivity, h, startTarget);
 
     ASSERT_EQ(p.size() , 4u);
