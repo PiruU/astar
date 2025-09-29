@@ -1,9 +1,10 @@
+#include <atomic>
 #include <gtest/gtest.h>
 
 #include "astar.h"
-#include "connectivity_map.h"
 #include "vertex.h"
 #include "face.h"
+#include "mesh.h"
 #include "heuristics.h"
 
 namespace astar {
@@ -11,13 +12,6 @@ namespace astar {
 namespace tests {
 
 namespace {
-
-struct Mesh {
-
-    Vertices vertices;
-    Faces faces;
-
-};
 
 Mesh make_simple_square() {
 
@@ -71,12 +65,8 @@ Mesh make_complex_grid() {
 TEST(SimpleAStarTest, FindsDirectShortestPathOnSimpleSquareMesh) {
 
     const auto mesh = make_simple_square();
-
     const auto h = HeuristicsFactory::make_euclidian(mesh.vertices[3]);
-
-    const auto startTarget = EndVertices{0, 3};
-    const auto connectivity = ConnectivityMapFactory::make_vertex_to_vertex(mesh.vertices, mesh.faces);
-    const auto p = find_best_path(mesh.vertices, connectivity, h, startTarget);
+    const auto p = find_best_path(mesh, h, std::pair<std::size_t, std::atomic_size_t>{ 0, 3 });
 
     ASSERT_EQ(p.size() , 2u);
     EXPECT_EQ(p.front(), 0u);
@@ -87,12 +77,8 @@ TEST(SimpleAStarTest, FindsDirectShortestPathOnSimpleSquareMesh) {
 TEST(ComplexAStarTest, FindsStraightShortestPathOnComplexGridMesh) {
 
     const auto mesh = make_complex_grid();
-
     const auto h = HeuristicsFactory::make_euclidian(mesh.vertices[8]);
-
-    const auto startTarget = EndVertices{0, 8};
-    const auto connectivity = ConnectivityMapFactory::make_vertex_to_vertex(mesh.vertices, mesh.faces);
-    const auto p = find_best_path(mesh.vertices, connectivity, h, startTarget);
+    const auto p = find_best_path(mesh, h, std::pair<std::size_t, std::atomic_size_t>{ 0, 8 });
 
     ASSERT_EQ(p.size() , 3u);
     EXPECT_EQ(p.at(0), 0u);
@@ -104,12 +90,8 @@ TEST(ComplexAStarTest, FindsStraightShortestPathOnComplexGridMesh) {
 TEST(ComplexAStarTest, FindsTwistedShortestPathOnComplexGridMesh) {
 
     const auto mesh = make_complex_grid();
-
     const auto h = HeuristicsFactory::make_euclidian(mesh.vertices[2]);
-
-    const auto startTarget = EndVertices{6, 2};
-    const auto connectivity = ConnectivityMapFactory::make_vertex_to_vertex(mesh.vertices, mesh.faces);
-    const auto p = find_best_path(mesh.vertices, connectivity, h, startTarget);
+    const auto p = find_best_path(mesh, h, std::pair<std::size_t, std::atomic_size_t>{ 6, 2 });
 
     ASSERT_EQ(p.size() , 4u);
     EXPECT_EQ(p.at(0), 6u);

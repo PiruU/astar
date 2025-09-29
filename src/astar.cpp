@@ -1,3 +1,5 @@
+#include <variant>
+
 #include "vertex.h"
 #include "heuristics.h"
 #include "connectivity_map.h"
@@ -39,13 +41,39 @@ bool extend_path(Path& path, const Vertices& vertices, const ConnectivityMap& co
 
 }
 
+class FindBestPath {
+
+private:
+
+    const Mesh& mesh;
+    const Heuristics& heuristics;
+
+public:
+
+    FindBestPath(const Mesh& m, const Heuristics& h) : mesh{ m }, heuristics{ h } {  };
+
+    Path operator()(const std::pair<std::size_t, std::size_t>& ends) const {
+
+        auto path = Path{ ends.first };
+        const auto connectivity = ConnectivityMapFactory::make_vertex_to_vertex(mesh.vertices, mesh.faces);
+        detail::extend_path(path, mesh.vertices, connectivity, heuristics, ends.second);
+        return path;
+
+    }
+
+    Path operator()(const std::pair<Barycenter, Barycenter>& ends) const {
+
+        return { };
+    
+    }
+
+};
+
 } // namespace squaremind::detail
 
-Path find_best_path(const Vertices& vertices, const ConnectivityMap& connectivity, const Heuristics& heuristics, const EndVertices& startAndTarget) {
+Path find_best_path(const Mesh& mesh, const Heuristics& heuristics, const Ends& ends) {
 
-    auto path = Path{ startAndTarget.first };
-    detail::extend_path(path, vertices, connectivity, heuristics, startAndTarget.second);
-    return path;
+    return std::visit(detail::FindBestPath{ mesh, heuristics }, ends);
 
 }
 
