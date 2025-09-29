@@ -1,223 +1,253 @@
-# Astar Library
+# Astar — Pathfinding on 3D Meshes (C++17 + nanobind)
 
-A lightweight C++17 library implementing an **A*** pathfinding algorithm on 3D meshes.  
-It provides simple primitives (`Vertex`, `Face`, `Edge`), utilities (`EdgeMap`, `ConnectivityMap`), and the `find_best_path` function.
+Lightweight C++17 library implementing a **pathfinding (A\*)** algorithm on 3D triangular meshes, with an optional Python binding via **nanobind**. The core exposes primitives (`Vertex`, `Face`, `Mesh`, …) and the **`find_best_path`** function.
 
 ---
 
 ## Table of Contents
 
 1. [Overview](#overview)  
-2. [Features](#features)  
-3. [Project Structure](#project-structure)  
-4. [Installation](#installation)  
-5. [Build Instructions](#build-instructions)  
-6. [API Documentation](#api-documentation)  
-   - [Types](#types)  
-   - [Functions](#functions)  
-7. [Example Usage](#example-usage)  
-8. [Unit Tests](#unit-tests)  
-9. [License](#license)  
+2. [Main Structures & API](#main-structures--api)  
+3. [Repository Layout](#repository-layout)  
+4. [Prerequisites](#prerequisites)  
+5. [Build (C++ library)](#build-c-library)  
+6. [Unit Tests (GoogleTest)](#unit-tests-googletest)  
+6. [Python Binding (nanobind)](#python-binding-nanobind)  
+   - [Build the Python Module](#build-the-python-module)  
+   - [Python Smoke Test](#python-smoke-test)  
+7. [Usage Examples](#usage-examples)  
+   - [C++](#c)  
+   - [Python](#python)  
+8. [Troubleshooting (Build FAQ)](#troubleshooting-build-faq)
 
 ---
 
 ## Overview
 
-This library lets you compute shortest paths on meshes using the **A*** algorithm.  
-Given a set of vertices and triangular faces, it finds the optimal path between two vertices.
+The project provides:
+
+- **Basic types**: `Vertex = std::array<float,3>`, `Face = std::array<std::size_t,3>`, `Mesh`, `Path`,
+- **Graph utilities** (connectivity/edges) to build adjacency,
+- A configurable **heuristic** (`std::function<float(const Vertex&, const Vertex&)>`),
+- And **`find_best_path`** (A\*) to return an optimal path on the mesh.
 
 ---
 
-## Features
-
-- Simple mesh primitives: **Vertex**, **Face**, **Edge**  
-- **Norms**: Euclidean distance  
-- **Heuristics**: Euclidean heuristic generator  
-- **EdgeMap**: edges and their lengths derived from faces  
-- **ConnectivityMap**: adjacency relationships between vertices  
-- **A*** algorithm: `find_best_path` function  
-
----
-
-## Project Structure
-
-```
-src/
-├── astar.h / .cpp             # A* algorithm (find_best_path)
-├── connectivity_map.h / .cpp  # Connectivity map from edges
-├── edge_map.h / .cpp          # Edge map from faces
-├── heuristics.h / .cpp        # Heuristic factories
-├── norms.h / .cpp             # Norms (Euclidean)
-├── face.h                     # Face definition
-├── path.h                     # Path definition
-└── vertex.h                   # Vertex definition
-
-tests/
-├── astar_test.cpp
-├── connectivity_map_test.cpp
-├── edge_map_test.cpp
-├── heuristics_test.cpp
-└── norms_test.cpp
-```
-
----
-
-## Installation
-
-Clone the repository:
-
-```bash
-git clone https://github.com/PiruU/astar
-cd astar
-```
-
-Make sure you have:  
-- A **C++17** capable compiler  
-- **CMake ≥ 3.20**  
-- **GoogleTest** (downloaded automatically with `FetchContent`)  
-
----
-
-## Build Instructions
-
-```bash
-# Configure
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-
-# Build the library and tests
-cmake --build build --parallel
-
-# Run tests (without CTest: launch test binaries directly)
-./build/tests/astar_test
-./build/tests/connectivity_map_test
-./build/tests/edge_map_test
-./build/tests/heuristics_test
-./build/tests/norms_test
-```
-
----
-
-## API Documentation
+## Main Structures & API
 
 ### Types
 
-- **`Vertex`** – point in 3D space  
-  ```cpp
-  Vertex v{1.0f, 2.0f, 0.0f};
-  ```
+```cpp
+using Vertex   = std::array<float, 3>;
+using Face     = std::array<std::size_t, 3>;
+using Vertices = std::vector<Vertex>;
+using Faces    = std::vector<Face>;
 
-- **`Vertices`** – collection of vertices (`std::vector<Vertex>`)
+struct Path {
+    std::vector<std::size_t> steps;       // indices of visited vertices
+    std::optional<Vertices>  vertices;    // path vertices (optional)
+};
 
-- **`Face`** – triangle defined by three indices  
-  ```cpp
-  Face f{ {0, 1, 2} };
-  ```
+struct Mesh {
+    Vertices vertices;
+    Faces    faces;
+};
 
-- **`Faces`** – collection of faces
+struct Heuristics {
+    // distance(a, b) -> float estimate
+    std::function<float(const Vertex&, const Vertex&)> distance;
+};
 
-- **`Edge`** – undirected edge between two vertices
+struct Barycenter {
+    std::size_t face;
+    std::array<float, 3> weights;         // barycentric weights (sum = 1)
+};
 
-- **`EdgeMap`** – map from `Edge` to length
+// Path endpoints: either two vertex indices OR two barycenters
+using Ends = std::variant<
+    std::pair<std::size_t, std::size_t>,
+    std::pair<Barycenter, Barycenter>
+>;
+```
 
-- **`ConnectivityMap`** – adjacency list (`vertex → neighbors`)
+### Function
 
-- **`Heuristics`** – callable object estimating distance to target
+```cpp
+Path find_best_path(const Mesh& mesh,
+                    const Heuristics& heuristics,
+                    const Ends& ends,
+                    const bool retrieve_vertices = false);
+```
 
-- **`Path`** – ordered sequence of vertex indices
+- `retrieve_vertices=true` fills `Path::vertices` with the coordinates of the path vertices.
+- `Ends` lets you specify endpoints **on vertices** or **inside faces** (barycenters).
 
 ---
 
-### Functions
+## Repository Layout
 
-#### `float euclidian_norm(const Vertex&, const Vertex&)`
-Compute the Euclidean distance between two vertices.
+```
+src/
+├── astar.cpp / astar.h                  # A* / find_best_path (+ Barycenter, Ends)
+├── connectivity_map.cpp / .h            # connectivity construction
+├── edge_map.cpp / .h                    # edge construction
+├── heuristics.cpp / .h                  # heuristics (distance)
+├── norms.cpp / .h                       # norms (Euclidean…)
+├── face.h  mesh.h  path.h  vertex.h     # basic types
+└── CMakeLists.txt                       # builds the C++ lib (e.g. target astar_lib)
 
-#### `Heuristics HeuristicsFactory::make_euclidian(const Vertex& target)`
-Return a heuristic function based on Euclidean distance to `target`.
+python_package/
+├── bindings.cpp                         # nanobind module
+└── CMakeLists.txt                       # builds the Python module (target astar_py)
+```
 
-#### `EdgeMap EdgeMapFactory::make(const Vertices&, const Faces&)`
-Construct all edges and lengths from a mesh.
-
-#### `ConnectivityMap ConnectivityMapFactory::make(const EdgeMap&)`
-Build adjacency from edges.
-
-#### `Path find_best_path(const Vertices&, const Faces&, const Heuristics&, const EndVertices&)`
-Compute the optimal path between a start and a goal vertex using A*.
+> The Python bindings are isolated under `python_package/` and link against the C++ library built from `src/`.
 
 ---
 
-## Example Usage
+## Prerequisites
 
-The following program builds a square mesh, splits it into two triangles, and finds a path between opposite corners:
+- **C++17** (recent Clang, GCC, or MSVC)  
+- **CMake ≥ 3.16**  
+- (For the Python module) **Python ≥ 3.8**, **nanobind** (`pip install nanobind`)
+
+---
+
+## Build (C++ library)
+
+From the repository root:
+
+```bash
+cmake -S src -B build_core -DCMAKE_BUILD_TYPE=Release
+cmake --build build_core -j
+```
+
+The static/shared library will be generated (for example: target `astar_lib` → `build_core/libastar_lib.a`).
+
+---
+
+## Unit Tests (GoogleTest)
+
+From the repository root:
+
+```bash
+cmake -S tests -B build_tests -DCMAKE_BUILD_TYPE=Release
+cmake --build build_tests -j
+```
+
+---
+
+## Python Binding (nanobind)
+
+### Build the Python Module
+
+```bash
+python -m pip install -U nanobind
+
+rm -rf build_py
+cmake -S python_package -B build_py   -DPython_EXECUTABLE="$(python -c 'import sys; print(sys.executable)')"   -Dnanobind_DIR="$(python -m nanobind --cmake_dir)"
+
+cmake --build build_py -j
+```
+
+The produced module will typically be `astar_py.cpython-<ver>-<plat>.so` under `build_py/`.
+
+### Python Smoke Test
+
+```bash
+PYTHONPATH=build_py python - <<'PY'
+import math, astar_py as ap
+m = ap.Mesh()
+m.vertices = [(0.0,0.0,0.0),(1.0,0.0,0.0),(0.0,1.0,0.0)]
+m.faces    = [(0,1,2)]
+h = ap.Heuristics()
+h.distance = lambda a,b: math.dist(a,b)
+ends = ap.ends_vertex_vertex(0, 2)
+p = ap.find_best_path(m, h, ends, retrieve_vertices=True)
+print("steps:", p.steps)
+print("vertices:", p.vertices)
+PY
+```
+
+---
+
+## Usage Examples
+
+### C++
 
 ```cpp
 #include "astar.h"
-#include "vertex.h"
-#include "face.h"
+#include "mesh.h"
 #include "heuristics.h"
-#include <vector>
-#include <iostream>
-
-using namespace astar;
+#include <cmath>
 
 int main() {
-    // Vertices: square in XY plane
-    Vertices vertices{
-        Vertex{0.0f, 0.0f, 0.0f}, // 0
-        Vertex{1.0f, 0.0f, 0.0f}, // 1
-        Vertex{1.0f, 1.0f, 0.0f}, // 2
-        Vertex{0.0f, 1.0f, 0.0f}  // 3
+    Mesh mesh;
+    mesh.vertices = {
+        Vertex{0.f,0.f,0.f}, Vertex{1.f,0.f,0.f}, Vertex{0.f,1.f,0.f}
+    };
+    mesh.faces = { Face{ {0,1,2} } };
+
+    Heuristics h;
+    h.distance = [](const Vertex& a, const Vertex& b) -> float {
+        const float dx=a[0]-b[0], dy=a[1]-b[1], dz=a[2]-b[2];
+        return std::sqrt(dx*dx + dy*dy + dz*dz);
     };
 
-    // Faces: two triangles forming the square
-    Faces faces{
-        Face{ {0, 1, 2} },
-        Face{ {0, 2, 3} }
-    };
-
-    // Euclidean heuristic toward target (vertex 3)
-    Heuristics h = HeuristicsFactory::make_euclidian(vertices[3]);
-
-    // Run A*
-    EndVertices startTarget{0, 3};
-    Path p = find_best_path(vertices, faces, h, startTarget);
-
-    // Print path
-    std::cout << "Path found: ";
-    for (auto v : p) {
-        std::cout << v << " ";
-    }
-    std::cout << std::endl;
+    Ends ends = std::pair<std::size_t,std::size_t>{0, 2};
+    Path p = find_best_path(mesh, h, ends, /*retrieve_vertices=*/true);
+    // p.steps -> indices; p.vertices -> positions (if requested)
 }
 ```
 
-Expected output:
+### Python
 
-```
-Path found: 0 3
+```python
+import math, astar_py as ap
+
+m = ap.Mesh()
+m.vertices = [(0.0,0.0,0.0),(1.0,0.0,0.0),(0.0,1.0,0.0)]
+m.faces    = [(0,1,2)]
+
+h = ap.Heuristics()
+h.distance = lambda a,b: math.dist(a,b)
+
+# Two vertex indices
+ends = ap.ends_vertex_vertex(0, 2)
+
+# Or two barycenters:
+# A = ap.Barycenter(); A.face=0; A.weights=(1/3,1/3,1/3)
+# B = ap.Barycenter(); B.face=0; B.weights=(0.2,0.3,0.5)
+# ends = ap.ends_bary_bary(A, B)
+
+p = ap.find_best_path(m, h, ends, retrieve_vertices=True)
+print(p.steps, p.vertices)
 ```
 
 ---
 
-## Unit Tests
+## Troubleshooting (Build FAQ)
 
-Unit tests are written with **GoogleTest**.  
-Each module (`astar`, `connectivity_map`, `edge_map`, `heuristics`, `norms`) has a corresponding test file in `tests/`.
+- **CMake cache conflict**  
+  `CMakeLists.txt does not match the source …`  
+  → Use **one build dir per source** (`build/`, `build_py/`). Remove `CMakeCache.txt` if needed.
 
-Run all tests after building:
+- **Python / nanobind order**  
+  `You must invoke find_package(Python …) prior to including nanobind`  
+  → Call `find_package(Python … Interpreter Development.Module)` **before** `find_package(nanobind)`.
 
-```bash
-./build/tests/astar_test
-./build/tests/connectivity_map_test
-./build/tests/edge_map_test
-./build/tests/heuristics_test
-./build/tests/norms_test
-```
+- **Missing nanobind headers** (`nanobind/trampoline.h`, etc.)  
+  → Prefer nanobind installed via **pip** and pass  
+  `-Dnanobind_DIR="$(python -m nanobind --cmake_dir)"`.
 
-## Python binding
+- **nanobind CLI option**  
+  → The correct option is `--cmake_dir` (underscore), not `--cmake-dir`.
 
-rm -rf build_py
-cmake -S python_package -B build_py \
-  -DPython_EXECUTABLE="$(python -c 'import sys; print(sys.executable)')" \
-  -Dnanobind_DIR="$(python -m nanobind --cmake_dir)"
-cmake --build build_py -j
+- **ImportError: missing PyInit_…**  
+  → Ensure the module name is aligned:  
+  `NB_MODULE(astar_py, m)` / `nanobind_add_module(astar_py …)` / `import astar_py`, then **clean rebuild**.
+
+- **Linker issues**  
+  `ld: library 'xxx' not found`  
+  → Link the actual **CMake target** (e.g., `astar_lib`):  
+  `target_link_libraries(astar_py PRIVATE astar_lib)`.
