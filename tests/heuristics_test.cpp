@@ -11,7 +11,7 @@ namespace tests {
 TEST(HeuristicsTest, EuclidianHeuristicEqualsDistanceToTarget) {
 
     const auto target = Vertex{ 1.0f, 2.0f, 3.0f };
-    const auto h = HeuristicsFactory::make_euclidian(target);
+    const auto h = HeuristicsFactory::make_euclidian();
 
     const auto p = Vertex{ 4.0f, -2.0f, 7.5f };
     float expected = euclidian_norm(p, target);

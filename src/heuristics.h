@@ -8,14 +8,13 @@ namespace astar {
 
 struct Heuristics {
 
-    Vertex target;
     std::function<float(const Vertex&, const Vertex&)> distance;
 
 };
 
 namespace HeuristicsFactory {
 
-Heuristics make_euclidian(const Vertex& target);
+Heuristics make_euclidian();
 
 } // namespace astar::HeuristicsFactory
 

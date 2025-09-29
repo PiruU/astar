@@ -15,10 +15,11 @@ struct NeighborLess {
     const std::vector<Vertex>& vertices;
     const Heuristics &heuristics;
     const std::size_t current;
+    const std::size_t target;
 
     bool operator()(const std::size_t one, const std::size_t other) const {
-        const auto one_cost   = heuristics.distance(vertices[current], vertices[one]  ) + heuristics.distance(vertices[one]  , heuristics.target);
-        const auto other_cost = heuristics.distance(vertices[current], vertices[other]) + heuristics.distance(vertices[other], heuristics.target);
+        const auto one_cost   = heuristics.distance(vertices[current], vertices[one]  ) + heuristics.distance(vertices[one]  , vertices[target]);
+        const auto other_cost = heuristics.distance(vertices[current], vertices[other]) + heuristics.distance(vertices[other], vertices[target]);
         return one_cost < other_cost;
     }
 
@@ -33,7 +34,7 @@ bool extend_path(Path& path, const Vertices& vertices, const ConnectivityMap& co
         path.emplace_back(*std::min_element(
             connectivity.at(back).begin(),
             connectivity.at(back).end(),
-            detail::NeighborLess{ vertices, heuristics, back })
+            detail::NeighborLess{ vertices, heuristics, back, last })
         );
         extend_path(path, vertices, connectivity, heuristics, last);     
         return false;
