@@ -85,10 +85,13 @@ Path find_best_path(const Mesh& mesh,
 
 ```
 ├── CMakeLists.txt 
+├── assets
+│ └── pond_path.png 
 ├── benches 
 │ ├── bench_python.py 
 │ ├── mesh_display.py 
-│ └── path_display.py 
+│ ├── path_display.py 
+│ └── pond_mesh.py 
 ├── cmake 
 │ └── AstarConfig.cmake.in 
 ├── include 
