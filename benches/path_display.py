@@ -19,7 +19,7 @@ class _DisplayPath:
     def visit(self, display: PathDisplay) -> None:
         vertices = display.path.vertices
         xs, ys, _ = zip(*itertools.islice(itertools.cycle(vertices), len(vertices)))
-        matplotlib.pyplot.plot(xs, ys, 'o-', color='r')
+        matplotlib.pyplot.plot(xs, ys, '-', color='r', lw=3)
 
 def display_path(display: PathDisplay) -> None:
     display(_DisplayPath())

@@ -18,7 +18,7 @@ class MeshDisplay(Visitable):
 class _DisplayVertices:
     def visit(self, display: MeshDisplay) -> None:
         for x, y, _ in display.mesh.vertices:
-            matplotlib.pyplot.plot(x, y, 'o', color='b')
+            matplotlib.pyplot.plot(x, y, 'o', color='b', ms=3)
 
 @dataclasses.dataclass
 class _DisplayFace:
