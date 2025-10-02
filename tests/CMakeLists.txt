@@ -1,9 +1,7 @@
-# tests/CMakeLists.txt
 cmake_minimum_required(VERSION 3.14)
 
 include(FetchContent)
 
-# Empêche gtest d’installer ses headers/cibles
 set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
 
 FetchContent_Declare(googletest
