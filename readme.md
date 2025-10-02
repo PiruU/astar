@@ -2,6 +2,8 @@
 
 Lightweight C++17 library implementing a **pathfinding (A\*)** algorithm on 3D triangular meshes, with an optional Python binding via **nanobind**. The core exposes primitives (`Vertex`, `Face`, `Mesh`, …) and the **`find_best_path`** function.
 
+![Pond path](./assets/pond_path.png)
+
 ---
 
 ## Table of Contents
